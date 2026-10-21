@@ -25,19 +25,19 @@ jobs:
       # Restore cached node_modules based on yarn.lock checksum
       - restore_cache:
           keys:
-            - v1-node-deps-{{ checksum "yarn.lock" }}
-            - v1-node-deps-
+            - v1-yarn-deps-{{ checksum "yarn.lock" }}
+            - v1-yarn-deps-
 
-      # Install dependencies using clean install
+      # Install dependencies using Yarn
       - run:
           name: Install Dependencies
-          command: npm ci
+          command: yarn install
 
-      # Save node_modules cache for subsequent runs
+      # Save Yarn cache for subsequent runs
       - save_cache:
           paths:
-            - ~/.npm
-          key: v1-node-deps-{{ checksum "yarn.lock" }}
+            - ~/.cache/yarn
+          key: v1-yarn-deps-{{ checksum "yarn.lock" }}
 
       # Wait for PostgreSQL to be fully up and running before tests
       - run:
