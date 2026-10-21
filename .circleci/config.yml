@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build-and-test:
     docker:
-      - image: cimg/node:20.0
+      - image: cimg/node:24.0
         environment:
           # Connection string for your NestJS app (TypeORM, Prisma, Knex, etc.)
           DATABASE_URL: postgresql://postgres@localhost:5432/circle_test
@@ -13,7 +13,7 @@ jobs:
           DB_PASSWORD: ''
           DB_DATABASE: circle_test
 
-      - image: cimg/postgres:15.19
+      - image: cimg/postgres:18.4
         environment:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ''
