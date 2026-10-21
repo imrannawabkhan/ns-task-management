@@ -9,7 +9,7 @@ import { configValidationSchema } from './config.schema.js';
   imports: [
     ConfigModule.forRoot({
       //isGlobal: true, // Makes ConfigModule available everywhere
-      envFilePath: [`.env.stage.dev`],
+      envFilePath: [`.env.stage.prod`],
       validationSchema: configValidationSchema,
     }),
     TasksModule,
