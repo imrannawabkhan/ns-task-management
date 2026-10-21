@@ -22,22 +22,22 @@ jobs:
     steps:
       - checkout
 
-      # Restore cached node_modules based on package-lock.json checksum
+      # Restore cached node_modules based on yarn.lock checksum
       - restore_cache:
           keys:
-            - v1-node-deps-{{ checksum "package-lock.json" }}
+            - v1-node-deps-{{ checksum "yarn.lock" }}
             - v1-node-deps-
 
-      # Install dependencies using clean install
+      # Install dependencies using frozen lockfile
       - run:
           name: Install Dependencies
-          command: npm ci
+          command: yarn install --frozen-lockfile
 
-      # Save node_modules cache for subsequent runs
+      # Save yarn cache for subsequent runs
       - save_cache:
           paths:
-            - ~/.npm
-          key: v1-node-deps-{{ checksum "package-lock.json" }}
+            - ~/.cache/yarn
+          key: v1-node-deps-{{ checksum "yarn.lock" }}
 
       # Wait for PostgreSQL to be fully up and running before tests
       - run:
@@ -59,17 +59,17 @@ jobs:
       # Run code linting
       - run:
           name: Run Linter
-          command: npm run lint
+          command: yarn lint
 
       # Run unit/integration tests (connected to PostgreSQL)
       - run:
           name: Run Tests
-          command: npm run test
+          command: yarn test
 
       # Build the NestJS TypeScript application into the dist/ directory
       - run:
           name: Build Application
-          command: npm run build
+          command: yarn build
 
 workflows:
   version: 2
