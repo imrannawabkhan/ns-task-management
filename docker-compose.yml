@@ -1,0 +1,38 @@
+
+services:
+  nest-pgsql:
+    image: postgres:18-alpine
+    ports:
+      - '${FORWARD_DB_PORT:-5432}:5432'
+    environment:
+      PGPASSWORD: '${DB_PASSWORD:-secret}'
+      POSTGRES_DB: '${DB_DATABASE:-nestdb}'
+      POSTGRES_USER: '${DB_USERNAME:-nestuser}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+    volumes:
+      - nest-pgsql:/var/lib/postgresql
+      - ./create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql:ro
+    networks:
+      - nest
+    healthcheck:
+      test:
+        - CMD
+        - pg_isready
+        - -q
+        - -d
+        - '${DB_DATABASE:-nestdb}'
+        - -U
+        - '${DB_USERNAME:-nestuser}'
+      retries: 3
+      timeout: 5s
+      interval: 10s
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  nest-pgsql:
+    driver: local
+
+networks:
+  nest:
+    driver: bridge
