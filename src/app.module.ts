@@ -8,8 +8,8 @@ import { configValidationSchema } from './config.schema.js';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      //isGlobal: true, // Makes ConfigModule available everywhere
-      envFilePath: [`.env.stage.prod`],
+      isGlobal: true, // Production ConfigModule Environment
+      //envFilePath: [`.env.stage.prod`],
       validationSchema: configValidationSchema,
     }),
     TasksModule,
