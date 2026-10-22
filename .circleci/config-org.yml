@@ -1,0 +1,78 @@
+version: 2.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/node:24.16
+        environment:
+          # Connection string for your NestJS app (TypeORM, Prisma, Knex, etc.)
+          DATABASE_URL: postgresql://postgres@localhost:5432/circle_test
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: ''
+          DB_DATABASE: circle_test
+
+      - image: cimg/postgres:18.4
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ''
+          POSTGRES_DB: circle_test
+
+    steps:
+      - checkout
+
+      # Restore cached node_modules based on yarn.lock checksum
+      - restore_cache:
+          keys:
+            - v1-yarn-deps-{{ checksum "yarn.lock" }}
+            - v1-yarn-deps-
+
+      # Install dependencies using Yarn
+      - run:
+          name: Install Dependencies
+          command: yarn install
+
+      # Save Yarn cache for subsequent runs
+      - save_cache:
+          paths:
+            - ~/.cache/yarn
+          key: v1-yarn-deps-{{ checksum "yarn.lock" }}
+
+      # Wait for PostgreSQL to be fully up and running before tests
+      - run:
+          name: Wait for PostgreSQL
+          command: |
+            max_tries=30
+            tries=0
+            until nc -z localhost 5432; do
+              tries=$((tries + 1))
+              if [ $tries -gt $max_tries ]; then
+                echo "PostgreSQL is not available after $max_tries attempts."
+                exit 1
+              fi
+              echo "Waiting for PostgreSQL..."
+              sleep 1
+            done
+            echo "PostgreSQL is up and running!"
+
+      # Run code linting
+      - run:
+          name: Run Linter
+          command: yarn lint
+
+      # Run unit/integration tests
+      - run:
+          name: Run Tests
+          command: yarn test --passWithNoTests
+
+      # Build the NestJS application
+      - run:
+          name: Build Application
+          command: yarn build
+
+workflows:
+  version: 2
+  starter_pipeline:
+    jobs:
+      - build-and-test
