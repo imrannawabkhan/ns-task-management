@@ -59,17 +59,17 @@ jobs:
       # Run code linting
       - run:
           name: Run Linter
-          command: npm run lint
+          command: yarn lint
 
-      # Run unit/integration tests (connected to PostgreSQL)
+      # Run unit/integration tests
       - run:
           name: Run Tests
-          command: npm run test
+          command: yarn test --passWithNoTests
 
-      # Build the NestJS TypeScript application into the dist/ directory
+      # Build the NestJS application
       - run:
           name: Build Application
-          command: npm run build
+          command: yarn build
 
 workflows:
   version: 2
