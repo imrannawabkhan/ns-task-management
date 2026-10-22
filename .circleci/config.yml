@@ -14,8 +14,9 @@ jobs:
 
       # Install dependencies using Yarn with caching for speed
       - restore_cache:
-          keys: data-deps-{{ checksum "yarn.lock" }}
-            data-deps-
+          keys:
+            - data-deps-{{ checksum "yarn.lock" }}
+            - data-deps-
 
       - run:
           name: Install Dependencies (Yarn)
