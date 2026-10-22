@@ -9,6 +9,7 @@ jobs:
           POSTGRES_USER: nestdbu2026
           POSTGRES_DB: nestdb
           POSTGRES_PASSWORD: jpxOJhB6NQ345mO
+    steps:
       - checkout
 
       # Install dependencies using Yarn with caching for speed
