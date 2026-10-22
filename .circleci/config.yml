@@ -62,18 +62,37 @@ jobs:
           fingerprints:
             - 'YOUR_SSH_KEY_FINGERPRINT'
       - run:
+          name: Plan deployment
+          command: |
+            circleci run release plan deploy \
+              --environment-name="production" \
+              --component-name="${CIRCLE_PROJECT_REPONAME}" \
+              --target-version="1.0.${CIRCLE_BUILD_NUM}-${CIRCLE_SHA1:0:7}"
+      - run:
           name: Deploy over SSH
           command: |
             ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd /path/to/app && git pull && yarn install --production && yarn build && pm2 restart main"
 
-      # OPTION 2: If deploying via Docker instead, comment out SSH above and use this:
-      # - setup_remote_docker
-      # - run:
-      #     name: Build and Push Docker Image
-      #     command: |
-      #       echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
-      #       docker build -t $DOCKER_USER/nestjs-app:latest .
-      #       docker push $DOCKER_USER/nestjs-app:latest
+      - run:
+          name: Update deployment status to running
+          command: circleci run release update deploy --status=RUNNING
+      - run:
+          name: Update deployment status to success
+          command: circleci run release update deploy --status=SUCCESS
+          when: on_success
+      - run:
+          name: Update deployment status to failed
+          command: circleci run release update deploy --status=FAILED
+          when: on_fail
+
+  # OPTION 2: If deploying via Docker instead, comment out SSH above and use this:
+  # - setup_remote_docker
+  # - run:
+  #     name: Build and Push Docker Image
+  #     command: |
+  #       echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+  #       docker build -t $DOCKER_USER/nestjs-app:latest .
+  #       docker push $DOCKER_USER/nestjs-app:latest
 
 workflows:
   version: 2
