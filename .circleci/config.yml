@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build-and-test:
     docker:
-      - image: cimg/node:24.12
+      - image: cimg/node:24.16
         environment:
           # Connection string for your NestJS app (TypeORM, Prisma, Knex, etc.)
           DATABASE_URL: postgresql://postgres@localhost:5432/circle_test
