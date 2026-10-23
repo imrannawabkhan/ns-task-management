@@ -16,12 +16,17 @@ async function bootstrap() {
   const productionFrontendUrl = configService.get<string>('FRONTEND_URL_PROD');
   const developmentFrontendUrl = configService.get<string>('FRONTEND_URL_DEV');
 
-  // Build the allowed origins array dynamically
-  const allowedOrigins = [`${developmentFrontendUrl}`];
+  const allowedOrigins = [
+    developmentFrontendUrl
+      ? developmentFrontendUrl.replace(/\/$/, '')
+      : 'http://localhost:3001',
+  ];
 
   if (productionFrontendUrl) {
-    allowedOrigins.push(productionFrontendUrl);
-    console.log('IsServerActive: Prod - ' + productionFrontendUrl);
+    // Strip trailing slash if present
+    const cleanProdUrl = productionFrontendUrl.replace(/\/$/, '');
+    allowedOrigins.push(cleanProdUrl);
+    console.log('IsServerActive: Prod - ' + cleanProdUrl);
   } else {
     console.log('IsServerActive: Dev');
   }
