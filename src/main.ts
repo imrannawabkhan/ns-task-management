@@ -20,11 +20,13 @@ async function bootstrap() {
   const allowedOrigins = [`${developmentFrontendUrl}`];
 
   if (productionFrontendUrl) {
-    console.log('IsServerActive: Prod');
     allowedOrigins.push(productionFrontendUrl);
+    console.log('IsServerActive: Prod - ' + productionFrontendUrl);
   } else {
     console.log('IsServerActive: Dev');
   }
+
+  console.log('Allowed Origins:', allowedOrigins);
 
   app.enableCors({
     origin: allowedOrigins,
