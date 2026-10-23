@@ -8,11 +8,28 @@ import { TransformInterceptor } from './transform.interceptor.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Get an instance of ConfigService from the Nest application container
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('APP_PORT') || 3000;
-  app.enableCors();
-  app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalInterceptors(new TransformInterceptor());
+
+  // Read the environment variable (e.g., FRONTEND_URL)
+  const productionFrontendUrl = configService.get<string>('FRONTEND_URL_PROD');
+  const developmentFrontendUrl = configService.get<string>('FRONTEND_URL_DEV');
+
+  // Build the allowed origins array dynamically
+  const allowedOrigins = [`${developmentFrontendUrl}`];
+
+  if (productionFrontendUrl) {
+    allowedOrigins.push(productionFrontendUrl);
+  }
+
+  app.enableCors({
+    origin: allowedOrigins,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
+  const port = configService.get<number>('PORT') ?? 3000;
   await app.listen(port);
 }
-await bootstrap();
+bootstrap();
